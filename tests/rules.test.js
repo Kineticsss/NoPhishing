@@ -53,3 +53,7 @@ test("domain-looking username fires R_USERINFO_DOMAIN", () => {
 test("keyword on shared hosting fires R_SHARED_HOSTING_KEYWORD", () => {
     assert.ok(fired("https://login-paypal.pages.dev/").includes("R_SHARED_HOSTING_KEYWORD"));
 });
+
+test("a blog with only a weak keyword is not flagged for shared-hosting abuse", () => {
+    assert.ok(!fired("http://savings-account-interest-rates.blogspot.com/").includes("R_SHARED_HOSTING_KEYWORD"));
+});

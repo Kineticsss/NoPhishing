@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { scoreUrl, scoreFeatures, verdictFor, MAX_SCORE } from "../extension/core/scorer.js";
+import { RULES } from "../extension/core/rules.js";
 
 test("benign site is allowed with score 0", () => {
     const r = scoreUrl("https://www.wikipedia.org/");
@@ -33,7 +34,7 @@ test("skipRules removes a rule from the score", () => {
     const full = scoreUrl("http://192.168.0.1/admin");
     const skipped = scoreUrl("http://192.168.0.1/admin", { skipRules: ["R_NO_HTTPS"] });
     assert.ok(!skipped.rules_fired.some((x) => x.id === "R_NO_HTTPS"));
-    assert.equal(skipped.score, full.score - 8);
+    assert.equal(skipped.score, full.score - RULES.find((r) => r.id === "R_NO_HTTPS").weight);
 });
 
 test("score is capped at 100 but rawScore is kept", () => {
@@ -66,7 +67,20 @@ test("unanalyzable input scores 0 with a reason", () => {
 
 test("verdict boundaries", () => {
     assert.equal(verdictFor(29), "allow");
-    assert.equal(verdictFor(30), "warn");
+    assert.equal(verdictFor(30), "suspicious");
+    assert.equal(verdictFor(39), "suspicious");
+    assert.equal(verdictFor(40), "warn");
     assert.equal(verdictFor(59), "warn");
     assert.equal(verdictFor(60), "blocked");
+});
+
+test("rules in the same group are capped", () => {
+    const rules = [
+        { id: "R_A", weight: 30, group: "host_structure", description: "a", test: () => true },
+        { id: "R_B", weight: 30, group: "host_structure", description: "b", test: () => true },
+        { id: "R_C", weight: 5, description: "c", test: () => true },
+    ];
+    const r = scoreFeatures({ analyzable: true }, { rules });
+    assert.equal(r.rawScore, 65);
+    assert.equal(r.score, 45); // 40 (capped group) + 5
 });

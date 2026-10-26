@@ -1,1 +1,1 @@
-{"type":"module","scripts":{"test":"node --test"},"devDependencies":{"csv-parse":"^7.0.3"}}
+{"type":"module","scripts":{"test":"node --test", "evaluate": "npm test && node scripts/evaluate.js"},"devDependencies":{"csv-parse":"^7.0.3"}}
