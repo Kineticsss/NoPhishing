@@ -1,0 +1,13 @@
+{
+    "manifest_version": 3,
+    "name": "NoPhishing",
+    "version": "1.0",
+    "description": "NoPhishing will stop Phishing links before they do their damage by blocking the site redirection.",
+    "action":{
+        "default_icon": {
+            
+        },
+        "default_title": "Start Extension",
+        "default_popup": "popup.html"
+    }
+}
