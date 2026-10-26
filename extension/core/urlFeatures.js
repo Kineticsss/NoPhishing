@@ -6,6 +6,8 @@ const SUSPICIOUS_KEYWORDS = [
 
 const SHORTENERS = new Set(["bit.ly", "tinyurl.com", "t.co", "goo.gl", "ow.ly", "is.gd"]);
 
+const COMMON_TLDS = new Set(["com", "net", "org", "edu", "gov", "info", "biz"]);
+
 function countChar (str, ch){
     return str.split(ch).length-1;
 }
@@ -87,6 +89,8 @@ export function extractFeatures (rawUrl) {
     // Falls back to the whole host when there is no registered domain.
     const domainLabel = registeredDomain ? registeredDomain.split(".")[0] : host;
     const domainEntropy = calcEntropy(domainLabel);
+    const subdomainHasTld = subdomain.split(".").some((l) => COMMON_TLDS.has(l));
+    const hostDigitRatio = host.length === 0 ? 0 : countDigits(host) / host.length;
 
     const queryHasUrl = /https?:\/\//i.test(safeDecode(url.search));
     const numEncodedChars = (href.match(/%[0-9a-f]{2}/gi) || []).length;
@@ -138,5 +142,7 @@ export function extractFeatures (rawUrl) {
         longestLabel,
         pathExtension,
         isShortener,
+        subdomainHasTld,
+        hostDigitRatio,
     };
 }
